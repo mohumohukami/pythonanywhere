@@ -14,18 +14,32 @@ from pathlib import Path
 
 import os
 import environ
+from django.core.management.utils import get_random_secret_key
+from dotenv import load_dotenv
 from decouple import config
 from dj_database_url import parse as dburl
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 env = environ.Env()
 env.read_env(os.path.join(BASE_DIR, ".env"))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-hnhv4pr*cg+)p81nj1z17^^ov-c5@b)@8xfn)a#0_p9f9^65$j'
+try:
+    from .local_settings import *
+    DEBUG = True
+    FRONTEND_URL = 'http://127.0.0.1:8000/'
+    ALLOWED_HOSTS = []
+
+except ImportError:
+    DEBUG = False
+    SECRET_KEY = get_random_secret_key()
+    ALLOWED_HOSTS = ['.pythonanywhere.com']
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
